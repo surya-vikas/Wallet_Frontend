@@ -17,15 +17,19 @@ export default function Login() {
   const [showSOS, setShowSOS] = useState(false);
   const navigate = useNavigate();
 
-  const handlePinComplete = async (value) => {
-    setPin(value);
+  const handleUnlock = async () => {
+    if (pin.length !== 4) {
+      setError('Please enter your PIN');
+      return;
+    }
+
     setError('');
     setLoading(true);
     try {
-      await login(value);
+      await login(pin);
       navigate('/');
     } catch (err) {
-      const msg = err.response?.data?.error?.message || 'Something went wrong';
+      const msg = err.response?.data?.message || err.response?.data?.error?.message || 'Something went wrong';
       setError(msg);
       setPin('');
       toast(msg, 'error');
@@ -63,7 +67,7 @@ export default function Login() {
 
         <PinInput
           key="login"
-          onComplete={handlePinComplete}
+          onComplete={setPin}
           disabled={loading}
           error={error}
         />
@@ -71,13 +75,7 @@ export default function Login() {
         <div className="mt-6 w-full">
           <Button
             variant="primary"
-            onClick={() => {
-              if (pin.length === 4) {
-                handlePinComplete(pin);
-              } else {
-                setError('Please enter your PIN');
-              }
-            }}
+            onClick={handleUnlock}
             loading={loading}
             disabled={pin.length < 4}
           >

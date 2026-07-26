@@ -68,14 +68,40 @@ export default function DocumentDetail() {
         URL.revokeObjectURL(url);
       });
     } catch {
-      window.open(doc.cloudinaryUrl, '_blank');
+      toast('Unable to prepare a valid PDF download for this document. Please re-upload the original PDF.', 'error');
     }
   };
 
-  const handleViewPdf = () => {
-    const pdfUrl = attachments[0]?.cloudinaryUrl || doc?.cloudinaryUrl;
-    if (!pdfUrl) return;
-    window.open(pdfUrl, '_blank', 'noopener,noreferrer');
+  const handleViewPdf = async () => {
+    if (!doc?.cloudinaryUrl) return;
+
+    const previewWindow = window.open('', '_blank');
+    if (!previewWindow) {
+      toast('Popup blocked. Please allow popups to view the PDF.', 'error');
+      return;
+    }
+
+    try {
+      const files = await buildDocumentFiles(doc);
+      const file = files[0];
+      if (!file) {
+        throw new Error('No PDF file available');
+      }
+
+      const url = URL.createObjectURL(file);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = file.name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+
+      previewWindow.location.href = url;
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (err) {
+      previewWindow.close();
+      toast(err.message || 'Unable to open PDF. Please re-upload the original PDF.', 'error');
+    }
   };
 
   const handleShare = async () => {

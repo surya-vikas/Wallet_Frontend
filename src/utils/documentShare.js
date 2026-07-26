@@ -30,6 +30,11 @@ function downloadBlob(blob, fileName) {
   URL.revokeObjectURL(url);
 }
 
+async function isPdfBlob(blob) {
+  const header = new Uint8Array(await blob.slice(0, 4).arrayBuffer());
+  return header[0] === 0x25 && header[1] === 0x50 && header[2] === 0x44 && header[3] === 0x46;
+}
+
 function getAttachmentList(doc) {
   if (Array.isArray(doc?.attachments) && doc.attachments.length > 0) {
     return doc.attachments;
@@ -53,7 +58,14 @@ async function buildDocumentFileFromAttachment(doc, attachment, index) {
   }
 
   const blob = await response.blob();
-  const mimeType = response.headers.get('content-type') || blob.type || MIME_BY_FILE_TYPE[attachment.fileType] || 'application/octet-stream';
+  const mimeType = attachment.fileType === 'pdf'
+    ? 'application/pdf'
+    : (response.headers.get('content-type') || blob.type || MIME_BY_FILE_TYPE[attachment.fileType] || 'application/octet-stream');
+
+  if (attachment.fileType === 'pdf' && !(await isPdfBlob(blob))) {
+    throw new Error('This document was stored as a preview image, not the original PDF. Please re-upload the original PDF.');
+  }
+
   const ext = EXT_BY_MIME[mimeType] || (attachment.fileType === 'pdf' ? 'pdf' : 'jpg');
   const baseName = sanitizeFileName(
     attachment.originalName || doc.documentName || `document-${index + 1}`

@@ -10,7 +10,7 @@ import NotificationBell from '../components/notifications/NotificationBell';
 import SOSCountdown from '../components/sos/SOSCountdown';
 import { sendSOS } from '../api/sos';
 import { collectSOSContext } from '../utils/sos';
-import { shareDocumentFile } from '../utils/documentShare';
+import { buildDocumentFiles, shareDocumentFile } from '../utils/documentShare';
 
 export default function CategoryDetail() {
   const { id } = useParams();
@@ -62,6 +62,24 @@ export default function CategoryDetail() {
     } catch (err) {
       if (err?.name === 'AbortError') return;
       toast(err.message || 'Failed to share document', 'error');
+    }
+  };
+
+  const handleDownload = async (doc) => {
+    try {
+      const files = await buildDocumentFiles(doc);
+      files.forEach((file) => {
+        const url = URL.createObjectURL(file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    } catch (err) {
+      toast(err.message || 'Unable to prepare a valid download', 'error');
     }
   };
 
@@ -146,11 +164,11 @@ export default function CategoryDetail() {
                 <button onClick={(e) => { e.stopPropagation(); handleShare(doc); }} className="p-2 rounded-xl active:bg-slate-100 dark:active:bg-[#1c2430] text-slate-400 dark:text-slate-300" aria-label="Share">
                   <Share2 size={18} />
                 </button>
-                <a href={doc.cloudinaryUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-2 rounded-xl active:bg-slate-100 dark:active:bg-[#1c2430] text-slate-400 dark:text-slate-300" aria-label="Download">
+                <button onClick={(e) => { e.stopPropagation(); handleDownload(doc); }} className="p-2 rounded-xl active:bg-slate-100 dark:active:bg-[#1c2430] text-slate-400 dark:text-slate-300" aria-label="Download">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                </a>
+                </button>
                 <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(doc._id); }} className="p-2 rounded-xl active:bg-red-50 dark:active:bg-[#24161b] text-slate-400 hover:text-red-500" aria-label="Delete">
                   <Trash2 size={18} />
                 </button>
