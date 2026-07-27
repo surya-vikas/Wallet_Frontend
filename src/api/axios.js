@@ -18,7 +18,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const authCode = error.response?.data?.error?.code;
+    if (error.response?.status === 401 && ['ERR_NO_TOKEN', 'ERR_INVALID_TOKEN', 'ERR_TOKEN_EXPIRED'].includes(authCode)) {
       localStorage.removeItem('token');
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';

@@ -1,0 +1,1 @@
+import{b as e}from"./index-ByGZtlmf.js";const c=t=>e.get("/documents",{params:t}),n=t=>e.get(`/documents/${t}`),a=(t,o={})=>e.post("/documents",t,{headers:{"Content-Type":"multipart/form-data"},...o}),m=t=>e.delete(`/documents/${t}`);export{n as a,a as c,m as d,c as g};

@@ -75,12 +75,6 @@ export default function DocumentDetail() {
   const handleViewPdf = async () => {
     if (!doc?.cloudinaryUrl) return;
 
-    const previewWindow = window.open('', '_blank');
-    if (!previewWindow) {
-      toast('Popup blocked. Please allow popups to view the PDF.', 'error');
-      return;
-    }
-
     try {
       const files = await buildDocumentFiles(doc);
       const file = files[0];
@@ -88,18 +82,25 @@ export default function DocumentDetail() {
         throw new Error('No PDF file available');
       }
 
-      const url = URL.createObjectURL(file);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = file.name;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
+      const downloadUrl = URL.createObjectURL(file);
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = downloadUrl;
+      downloadAnchor.download = file.name;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      document.body.removeChild(downloadAnchor);
 
-      previewWindow.location.href = url;
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      const viewerUrl = URL.createObjectURL(file);
+      const viewerWindow = window.open(viewerUrl, '_blank', 'noopener,noreferrer');
+      if (!viewerWindow) {
+        toast('PDF downloaded. If it did not open automatically, allow popups or open the downloaded file from your browser downloads.', 'info');
+      }
+
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadUrl);
+        URL.revokeObjectURL(viewerUrl);
+      }, 15000);
     } catch (err) {
-      previewWindow.close();
       toast(err.message || 'Unable to open PDF. Please re-upload the original PDF.', 'error');
     }
   };

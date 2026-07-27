@@ -1,1 +1,0 @@
-import{b as t}from"./index-DndO6eAx.js";const s=e=>t.get("/categories",{params:{search:e}}),g=e=>t.get(`/categories/${e}`),r=e=>t.post("/categories",e),c=(e,a)=>t.put(`/categories/${e}`,a),i=e=>t.delete(`/categories/${e}`);export{g as a,r as c,i as d,s as g,c as u};

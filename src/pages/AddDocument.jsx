@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import { ArrowLeft, FileText } from 'lucide-react';
+import { ArrowLeft, Folder, Upload } from 'lucide-react';
 
 export default function AddDocument() {
   const navigate = useNavigate();
   const location = useLocation();
   const { categoryId = null } = location.state || {};
+  const [mode, setMode] = useState(null);
   const [docName, setDocName] = useState('');
   const [hasExpiry, setHasExpiry] = useState(false);
   const [expiryDate, setExpiryDate] = useState('');
@@ -26,7 +27,17 @@ export default function AddDocument() {
   return (
     <div className="page-shell flex flex-col">
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate('/')} className="p-2 rounded-full active:bg-slate-100 dark:active:bg-[#1c2430] text-slate-500 dark:text-slate-300" aria-label="Back">
+        <button
+          onClick={() => {
+            if (mode) {
+              setMode(null);
+              return;
+            }
+            navigate('/');
+          }}
+          className="p-2 rounded-full active:bg-slate-100 dark:active:bg-[#1c2430] text-slate-500 dark:text-slate-300"
+          aria-label="Back"
+        >
           <ArrowLeft size={22} />
         </button>
         <div>
@@ -35,14 +46,48 @@ export default function AddDocument() {
         </div>
       </div>
 
-      <div className="hero-panel mb-4 text-center">
-        <div className="mx-auto w-20 h-20 rounded-3xl bg-white/80 dark:bg-[#111821] ring-1 ring-slate-200/80 dark:ring-[#232b38] flex items-center justify-center mb-4">
-          <FileText size={36} className="text-[#4f46e5]" />
-        </div>
-        <p className="text-sm text-slate-600 dark:text-slate-300">Give the document a name before you choose how to add it.</p>
-      </div>
+      {!mode && (
+        <div className="page-card">
+          <p className="section-label mb-3 block">Choose upload type</p>
+          <div className="grid grid-cols-1 gap-3">
+            <button
+              onClick={() => setMode('single')}
+              className="flex items-center gap-4 rounded-2xl border border-slate-200/80 dark:border-[#232b38] bg-white/70 dark:bg-[#0f141c] p-4 text-left active:scale-[0.99] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-[#1b2230] ring-1 ring-indigo-100/80 dark:ring-[#232b38] flex items-center justify-center shrink-0">
+                <Upload size={22} className="text-[#4f46e5]" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800 dark:text-slate-100">Single upload</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Add one document at a time</p>
+              </div>
+            </button>
 
-      <div className="page-card flex-1 flex flex-col gap-4">
+            <button
+              onClick={() => navigate('/documents/add/bulk', { state: { categoryId } })}
+              className="flex items-center gap-4 rounded-2xl border border-slate-200/80 dark:border-[#232b38] bg-white/70 dark:bg-[#0f141c] p-4 text-left active:scale-[0.99] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-[#183026] ring-1 ring-emerald-100/80 dark:ring-[#232b38] flex items-center justify-center shrink-0">
+                <Folder size={22} className="text-emerald-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-800 dark:text-slate-100">Bulk upload</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Add multiple files with separate names and expiry</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {mode === 'single' && (
+        <div id="single-upload-form" className="page-card flex-1 flex flex-col gap-4">
+        <div>
+          <p className="section-label mb-1 block">Single upload</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Give the document a name and expiry, then continue with the current single-file flow.
+          </p>
+        </div>
+
         <div>
           <label className="section-label mb-2 block">Document name</label>
           <input
@@ -86,7 +131,8 @@ export default function AddDocument() {
             Next
           </Button>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

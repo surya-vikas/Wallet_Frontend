@@ -1,38 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Outlet } from 'react-router-dom';
 
 export default function AppShell() {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-  const timerRef = useRef(null);
-  const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
-
-  useEffect(() => {
-    const lockNow = () => {
-      logout();
-      navigate('/login', { replace: true });
-    };
-
-    const resetTimer = () => {
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
-      timerRef.current = window.setTimeout(lockNow, IDLE_TIMEOUT_MS);
-    };
-
-    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
-    events.forEach((eventName) => window.addEventListener(eventName, resetTimer, { passive: true }));
-    resetTimer();
-
-    return () => {
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
-      events.forEach((eventName) => window.removeEventListener(eventName, resetTimer));
-    };
-  }, [logout, navigate]);
-
   return (
     <div className="relative min-h-screen max-w-lg mx-auto overflow-hidden text-slate-800 dark:text-slate-100 transition-colors duration-200">
       <div className="pointer-events-none absolute inset-0 opacity-80 dark:opacity-100">

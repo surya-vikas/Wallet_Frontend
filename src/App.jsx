@@ -11,6 +11,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const CategoryDetail = lazy(() => import('./pages/CategoryDetail'));
 const AddCategory = lazy(() => import('./pages/AddCategory'));
 const AddDocument = lazy(() => import('./pages/AddDocument'));
+const BulkUpload = lazy(() => import('./pages/BulkUpload'));
 const ChooseMethod = lazy(() => import('./pages/ChooseMethod'));
 const UploadFile = lazy(() => import('./pages/UploadFile'));
 const ScanDocument = lazy(() => import('./pages/ScanDocument'));
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path="/documents/add" element={<ProtectedRoute><AddDocument /></ProtectedRoute>} />
+          <Route path="/documents/add/bulk" element={<ProtectedRoute><BulkUpload /></ProtectedRoute>} />
           <Route path="/documents/add/method" element={<ProtectedRoute><ChooseMethod /></ProtectedRoute>} />
           <Route path="/documents/add/upload" element={<ProtectedRoute><UploadFile /></ProtectedRoute>} />
           <Route path="/documents/add/scan" element={<ProtectedRoute><ScanDocument /></ProtectedRoute>} />
