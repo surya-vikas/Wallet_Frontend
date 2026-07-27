@@ -8,8 +8,7 @@ import { toast } from '../components/ui/Toast';
 import { ArrowLeft, Search, Plus, FileText, Trash2, Share2, AlertTriangle } from 'lucide-react';
 import NotificationBell from '../components/notifications/NotificationBell';
 import SOSCountdown from '../components/sos/SOSCountdown';
-import { sendSOS } from '../api/sos';
-import { collectSOSContext } from '../utils/sos';
+import { sendSOSAlert } from '../utils/sos';
 import { buildDocumentFiles, shareDocumentFile } from '../utils/documentShare';
 
 export default function CategoryDetail() {
@@ -190,13 +189,12 @@ export default function CategoryDetail() {
         <SOSCountdown
           onComplete={async () => {
             try {
-              const { device, location } = await collectSOSContext();
-              await sendSOS(device, location);
+              await sendSOSAlert();
               toast('Emergency alert sent', 'success');
             } catch (err) {
               toast(err.response?.data?.error?.message || 'Failed', 'error');
+              throw err;
             }
-            setShowSOS(false);
           }}
           onCancel={() => setShowSOS(false)}
         />

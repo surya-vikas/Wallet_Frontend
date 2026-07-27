@@ -1,3 +1,5 @@
+import { sendSOS } from '../api/sos';
+
 function formatConnection(connection) {
   if (!connection) return 'Unknown';
 
@@ -77,5 +79,11 @@ export async function collectSOSContext() {
     }
   }
 
+  return { device, location };
+}
+
+export async function sendSOSAlert() {
+  const { device, location } = await collectSOSContext();
+  await sendSOS(device, location);
   return { device, location };
 }

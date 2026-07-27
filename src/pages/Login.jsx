@@ -4,8 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import PinInput from '../components/ui/PinInput';
 import Button from '../components/ui/Button';
 import SOSCountdown from '../components/sos/SOSCountdown';
-import { sendSOS } from '../api/sos';
-import { collectSOSContext } from '../utils/sos';
+import { sendSOSAlert } from '../utils/sos';
 import { toast } from '../components/ui/Toast';
 import { AlertTriangle } from 'lucide-react';
 
@@ -40,8 +39,7 @@ export default function Login() {
 
   const handleSOSComplete = async () => {
     try {
-      const { device, location } = await collectSOSContext();
-      await sendSOS(device, location);
+      await sendSOSAlert();
       toast('Emergency email sent successfully', 'success');
     } catch (err) {
       toast(err.response?.data?.error?.message || 'Failed to send SOS', 'error');

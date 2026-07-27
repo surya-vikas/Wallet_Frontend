@@ -14,8 +14,7 @@ import DocumentCard from '../components/documents/DocumentCard';
 import { Search, Plus, Folder, FileText, CreditCard, Car, Hash, Shield, Home, Activity, Landmark, Award, Receipt, File, LogOut, AlertTriangle } from 'lucide-react';
 import NotificationBell from '../components/notifications/NotificationBell';
 import SOSCountdown from '../components/sos/SOSCountdown';
-import { sendSOS } from '../api/sos';
-import { collectSOSContext } from '../utils/sos';
+import { sendSOSAlert } from '../utils/sos';
 
 const categoryIcons = {
   Aadhaar: CreditCard,
@@ -309,13 +308,12 @@ export default function Dashboard() {
         <SOSCountdown
           onComplete={async () => {
             try {
-              const { device, location } = await collectSOSContext();
-              await sendSOS(device, location);
+              await sendSOSAlert();
               toast('Emergency alert sent', 'success');
             } catch (err) {
               toast(err.response?.data?.error?.message || 'Failed', 'error');
+              throw err;
             }
-            setShowSOS(false);
           }}
           onCancel={() => setShowSOS(false)}
         />

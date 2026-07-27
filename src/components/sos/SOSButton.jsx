@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { sendSOS } from '../../api/sos';
-import { collectSOSContext } from '../../utils/sos';
+import { sendSOSAlert } from '../../utils/sos';
 import SOSCountdown from './SOSCountdown';
 import { AlertTriangle } from 'lucide-react';
 import { toast } from '../ui/Toast';
@@ -10,8 +9,7 @@ export default function SOSButton() {
 
   const handleComplete = async () => {
     try {
-      const { device, location } = await collectSOSContext();
-      await sendSOS(device, location);
+      await sendSOSAlert();
       toast('Emergency alert sent', 'success');
     } catch (err) {
       toast(err.response?.data?.error?.message || 'Failed to send SOS', 'error');
